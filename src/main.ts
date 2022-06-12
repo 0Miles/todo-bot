@@ -1,4 +1,4 @@
-import { Client, Intents, Message } from "discord.js";
+import { Client, Intents, Message, TextChannel } from "discord.js";
 
 export const bot = new Client({
     intents: [
@@ -16,16 +16,21 @@ bot.once("ready", async () => {
 });
 
 const enabledChannel = [
-    '981422936307146793',
-    '927432745012047972'
+    '927432745012047972',
+    '985016820182425680',
+    '985018089856979074'
 ];
 
 bot.on("messageCreate", async (message: Message) => {
     try {
         if (enabledChannel.includes(message.channel.id) && !message.author.bot) {
             if (message.mentions.members?.find(x => x.id === bot.user?.id)) {
-                const messages = await message.channel.messages.fetch({
+
+                const channel = bot.channels.cache.get(message.channelId) as TextChannel;
+                const messages = await channel.messages.fetch({
                     limit: 100
+                }, {
+                    force: true
                 });
                 const filteredMessage = [...messages
                     .filter(x =>
