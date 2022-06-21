@@ -17,7 +17,10 @@ export class TodoEvents {
                         resolve();
                     })
                     .catch(_ => {
-                        rejects();
+                        removeTodoMessage(x.getDataValue('guildId'), x.getDataValue('channelId'), x.getDataValue('messageId'))
+                            .finally(() => {
+                                rejects();
+                            });
                     });
             })
         }));
