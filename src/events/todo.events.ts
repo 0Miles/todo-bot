@@ -21,7 +21,7 @@ export class TodoEvents {
                     });
             })
         }));
-        return messages;
+        return messages.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
     }
 
     @On("messageCreate")
