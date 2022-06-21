@@ -1,79 +1,61 @@
-import { Client, Intents, Message, TextChannel } from "discord.js";
+import "reflect-metadata";
+
+import { dirname, importx } from "@discordx/importer";
+import type { Interaction, Message, TextChannel } from "discord.js";
+import { Intents } from "discord.js";
+import { Client } from "discordx";
 
 export const bot = new Client({
+    botGuilds: [(client) => client.guilds.cache.map((guild) => guild.id)],
+
     intents: [
         Intents.FLAGS.GUILDS,
         Intents.FLAGS.GUILD_MEMBERS,
         Intents.FLAGS.GUILD_MESSAGES,
         Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
         Intents.FLAGS.GUILD_VOICE_STATES,
-    ]
+    ],
+
+    silent: false,
+    
+    simpleCommand: {
+        prefix: "!",
+    },
 });
 
 bot.once("ready", async () => {
     await bot.guilds.fetch();
+    await bot.initApplicationCommands();
+    await bot.initApplicationPermissions();
     console.log("Bot started");
 });
 
-const enabledChannel = [
-    '927432745012047972',
-    '985016820182425680',
-    '985018089856979074'
-];
+bot.on("interactionCreate", (interaction: Interaction) => {
+    bot.executeInteraction(interaction);
+});
 
 bot.on("messageCreate", async (message: Message) => {
-    try {
-        if (enabledChannel.includes(message.channel.id) && !message.author.bot) {
-            if (message.mentions.members?.find(x => x.id === bot.user?.id)) {
-
-                const channel = bot.channels.cache.get(message.channelId) as TextChannel;
-                const messages = await channel.messages.fetch({
-                    limit: 100
-                }, {
-                    force: true
-                });
-                const filteredMessage = [...messages
-                    .filter(x =>
-                        x.reactions.cache.size === 0 &&
-                        (x.mentions.members?.size ?? 0) > 0 &&
-                        (!x.mentions.members?.find(x => x.id === bot.user?.id) || x.type === 'REPLY')
-                    ).values()
-                ].reverse();
-                for (const eachMessage of filteredMessage) {
-                    try {
-                        if (eachMessage.author.id === bot.user?.id && eachMessage.type === 'REPLY') {
-                            await eachMessage.delete();
-                        } else if (eachMessage.hasThread) {
-                            await eachMessage.reply(eachMessage.content);
-                        } else {
-                            await message.channel.send(eachMessage.content);
-                            await eachMessage.delete();
-                        }
-                    } catch (ex) {
-                        console.error(ex);
-                    }
-                }
-                await message.delete();
-            }
-        }
-    } catch (ex) {
-        console.error(ex);
-    }
-    
+    bot.executeCommand(message);
 });
 
 async function run() {
     try {
-        await bot.login(process.env.BOT_TOKEN);
+        await importx(dirname(import.meta.url) + "/{events,commands}/**/*.{ts,js}");
+        await bot.login(process.env.BOT_TOKEN ?? '');
     } catch (ex) {
         console.error(ex);
         resetBot();
     }
 }
 
-function resetBot() {
+async function resetBot() {
     bot.destroy();
-    console.log('bot restart...');
+    await new Promise<void>(resolve => {
+        setTimeout(() => {
+            resolve();
+        }, 10000);
+    });
+    console.log('Bot restarting...');
     run();
 }
 

@@ -9,3 +9,5 @@ app.yaml
 # folders
 build
 node_modules
+
+storage.sqlite
