@@ -63,7 +63,19 @@ bot.on("messageCreate", async (message: Message) => {
 });
 
 async function run() {
-    await bot.login(process.env.BOT_TOKEN);
+    try {
+        await bot.login(process.env.BOT_TOKEN);
+    } catch (ex) {
+        console.error(ex);
+        resetBot();
+    }
+}
+
+function resetBot() {
+    bot.destroy();
+    console.log('bot restart...');
+    run();
 }
 
 run();
+
