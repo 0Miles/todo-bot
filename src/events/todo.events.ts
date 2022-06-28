@@ -37,7 +37,7 @@ export class TodoEvents {
 
                     for (const eachMessage of todoMessages) {
                         try {
-                            if (eachMessage.reactions.cache.size !== 0 || (eachMessage.mentions.members?.size ?? 0) === 0) {
+                            if (eachMessage.reactions.cache.size > 0 || (eachMessage.mentions.members?.size ?? 0) === 0) {
                                 await removeTodoMessage(eachMessage.guildId ?? '', eachMessage.channelId, eachMessage.id);
                             } else if (eachMessage.author.id === client.user?.id && eachMessage.type === 'REPLY') {
                                 await eachMessage.delete();
@@ -76,7 +76,7 @@ export class TodoEvents {
                         await refMessage.react('👍');
                     }
                 }
-                removeTodoMessage(message.message.guildId ?? '', message.message.channelId, message.message.id);
+                await removeTodoMessage(message.message.guildId ?? '', message.message.channelId, message.message.id);
             }
         } catch (ex) {
             console.error(ex);
@@ -94,7 +94,7 @@ export class TodoEvents {
                         await refMessage?.reactions?.resolve('👍')?.remove();
                     }
                 }
-                addTodoMessage(message.message as Message);
+                await addTodoMessage(message.message as Message);
             }
 
         } catch (ex) {
