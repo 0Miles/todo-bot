@@ -1,7 +1,7 @@
-import { Message, MessageType, TextChannel } from "discord.js";
-import type { ArgsOf, Client } from "discordx";
-import { Discord, On } from "discordx";
-import { findTodoChannel, addTodoMessage, removeTodoMessage, getChannelTodoMessages } from "../db.js";
+import { Message, MessageType, TextChannel } from 'discord.js';
+import type { ArgsOf, Client } from 'discordx';
+import { Discord, On } from 'discordx';
+import { findTodoChannel, addTodoMessage, removeTodoMessage, getChannelTodoMessages } from '../db.js';
 
 @Discord()
 export class TodoEvents {
@@ -28,7 +28,7 @@ export class TodoEvents {
     }
 
     @On()
-    async messageCreate([message]: ArgsOf<"messageCreate">, client: Client): Promise<void> {
+    async messageCreate([message]: ArgsOf<'messageCreate'>, client: Client): Promise<void> {
         try {
             const channel = await findTodoChannel(message.guildId ?? '', message.channelId);
             if (channel && !message.author.bot) {
@@ -68,7 +68,7 @@ export class TodoEvents {
     }
 
     @On()
-    async messageReactionAdd([message]: ArgsOf<"messageReactionAdd">, client: Client): Promise<void> {
+    async messageReactionAdd([message]: ArgsOf<'messageReactionAdd'>, client: Client): Promise<void> {
         try {
             const channel = await findTodoChannel(message.message.guildId ?? '', message.message.channelId);
             if (channel && (message.count ?? 0) > 0) {
@@ -86,7 +86,7 @@ export class TodoEvents {
     }
 
     @On()
-    async messageReactionRemove([message]: ArgsOf<"messageReactionRemove">, client: Client): Promise<void> {
+    async messageReactionRemove([message]: ArgsOf<'messageReactionRemove'>, client: Client): Promise<void> {
         try {
             const channel = await findTodoChannel(message.message.guildId ?? '', message.message.channelId);
             if (channel && message.count === 0) {
