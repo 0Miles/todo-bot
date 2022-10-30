@@ -1,15 +1,17 @@
-import { addTodoChannel, addTodoMessage, removeTodoChannel } from './../db.js';
-import { CommandInteraction, Message, TextChannel, MessageType } from "discord.js";
-import { Discord, SimpleCommand, SimpleCommandMessage, Slash } from "discordx";
+import { addTodoChannel, addTodoMessage, removeTodoChannel } from '../db.js';
+import { CommandInteraction, Message, TextChannel, MessageType } from 'discord.js';
+import { Discord, Slash, SlashGroup } from 'discordx';
 
 @Discord()
-export class ChannelCommands {
+@SlashGroup({ description: 'Manage todo list channel', name: 'todo-channel', defaultMemberPermissions: '16' })
+@SlashGroup('todo-channel')
+export class TodoChannelCommands {
     async watchChannel(command: CommandInteraction | Message): Promise<void> {
         await addTodoChannel(command.guildId ?? '', command.channelId);
         await command.reply('Watch channel ``' + command.channelId + '``.');
     }
 
-    @Slash({ name: 'watch-channel', description: 'watch-channel', defaultMemberPermissions: '16' })
+    @Slash({ name: 'watch', description: 'Watch this channel as a todo list' })
     slashWatchChannel(command: CommandInteraction): void {
         this.watchChannel(command);
     }
@@ -19,7 +21,7 @@ export class ChannelCommands {
         await command.reply('Stop watching Channel ``' + command.channelId + '``.');
     }
 
-    @Slash({ name: 'stop-watch-channel', description: 'stop-watch-channel', defaultMemberPermissions: '16' })
+    @Slash({ name: 'stop-watch', description: 'Stop watching this channel as a todo list' })
     slashStopWatchChannel(command: CommandInteraction): void {
         this.stopWatchChannel(command);
     }
@@ -44,7 +46,7 @@ export class ChannelCommands {
         await command.reply('Checked.');
     }
 
-    @Slash({ name: 'check-cache', description: 'check-cache', defaultMemberPermissions: '16' })
+    @Slash({ name: 'check-cache', description: 'Check the cache for todo messages' })
     slashCheckCacheMessage(command: CommandInteraction): void {
         this.checkCacheMessage(command);
     }
