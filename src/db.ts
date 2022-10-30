@@ -10,14 +10,14 @@ const sequelize = new Sequelize({
     logging: false
 });
 
-export const TodoMessage = sequelize.define('Message', {
+export const TodoMessage = sequelize.define('TodoMessage', {
     messageId: DataTypes.STRING,
     channelId: DataTypes.STRING,
     guildId: DataTypes.STRING,
     createdAt: DataTypes.DATE
 });
 
-export const TodoChannel = sequelize.define('Channel', {
+export const TodoChannel = sequelize.define('TodoChannel', {
     channelId: DataTypes.STRING,
     guildId: DataTypes.STRING
 });
