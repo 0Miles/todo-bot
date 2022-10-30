@@ -15,8 +15,8 @@
   },
   "dependencies": {
     "@discordx/importer": "^1.1.10",
-    "discord.js": "^13.7.0",
-    "discordx": "^9.7.3",
+    "discord.js": "^14.6.0",
+    "discordx": "^11.4.0",
     "reflect-metadata": "^0.1.13",
     "sequelize": "^6.21.0",
     "sqlite3": "^5.0.8"

@@ -1,7 +1,7 @@
-import { Message, TextChannel } from "discord.js";
+import { Message, MessageType, TextChannel } from "discord.js";
 import type { ArgsOf, Client } from "discordx";
 import { Discord, On } from "discordx";
-import { findTodoChannel, getTodoChannels, addTodoMessage, removeTodoMessage, getChannelTodoMessages } from "../db.js";
+import { findTodoChannel, addTodoMessage, removeTodoMessage, getChannelTodoMessages } from "../db.js";
 
 @Discord()
 export class TodoEvents {
@@ -11,7 +11,7 @@ export class TodoEvents {
         const messages: Message[] = [];
         await Promise.allSettled(todoMessageIds.map(x => {
             return new Promise<void>(async (resolve, rejects) => {
-                message.channel.messages.fetch(x.getDataValue('messageId'))
+                message.channel.messages.fetch({ message: x.getDataValue('messageId') })
                     .then(result => {
                         messages.push(result);
                         resolve();
@@ -27,26 +27,28 @@ export class TodoEvents {
         return messages.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
     }
 
-    @On("messageCreate")
-    async onMessage([message]: ArgsOf<"messageCreate">, client: Client): Promise<void> {
+    @On()
+    async messageCreate([message]: ArgsOf<"messageCreate">, client: Client): Promise<void> {
         try {
             const channel = await findTodoChannel(message.guildId ?? '', message.channelId);
             if (channel && !message.author.bot) {
                 if (message.mentions.members?.find(x => x.id === client.user?.id)) {
                     const todoMessages = await this.loadTodoMessage(message);
-
-                    for (const eachMessage of todoMessages) {
+                    for (let eachMessage of todoMessages) {
                         try {
-                            if (eachMessage.reactions.cache.size > 0 || (eachMessage.mentions.members?.size ?? 0) === 0) {
+                            if (eachMessage.reactions.cache.size > 0 || (eachMessage.mentions.users?.size ?? 0) === 0) {
                                 await removeTodoMessage(eachMessage.guildId ?? '', eachMessage.channelId, eachMessage.id);
-                            } else if (eachMessage.author.id === client.user?.id && eachMessage.type === 'REPLY') {
+                            } else if (eachMessage.author.id === client.user?.id && eachMessage.type === MessageType.Reply) {
                                 await eachMessage.delete();
                                 await removeTodoMessage(eachMessage.guildId ?? '', eachMessage.channelId, eachMessage.id);
                             } else if (eachMessage.hasThread) {
                                 const newMessage = await eachMessage.reply(eachMessage.content);
                                 await addTodoMessage(newMessage);
                             } else {
-                                const newMessage = await message.channel.send(eachMessage.content);
+                                const newMessage = await message.channel.send({
+                                    content: eachMessage.content,
+                                    files: eachMessage.attachments.map(attachmentValue => attachmentValue)
+                                });
                                 await addTodoMessage(newMessage);
                                 await eachMessage.delete();
                                 await removeTodoMessage(eachMessage.guildId ?? '', eachMessage.channelId, eachMessage.id);
@@ -65,12 +67,12 @@ export class TodoEvents {
         }
     }
 
-    @On("messageReactionAdd")
-    async onMessageReactionAdd([message]: ArgsOf<"messageReactionAdd">, client: Client): Promise<void> {
+    @On()
+    async messageReactionAdd([message]: ArgsOf<"messageReactionAdd">, client: Client): Promise<void> {
         try {
             const channel = await findTodoChannel(message.message.guildId ?? '', message.message.channelId);
             if (channel && (message.count ?? 0) > 0) {
-                if (message.message.type === 'REPLY') {
+                if (message.message.type === MessageType.Reply) {
                     const refMessage = await message.message.channel.messages.fetch(message.message.reference?.messageId ?? '');
                     if (refMessage) {
                         await refMessage.react('👍');
@@ -83,12 +85,12 @@ export class TodoEvents {
         }
     }
 
-    @On("messageReactionRemove")
-    async onmessageReactionRemove([message]: ArgsOf<"messageReactionRemove">, client: Client): Promise<void> {
+    @On()
+    async messageReactionRemove([message]: ArgsOf<"messageReactionRemove">, client: Client): Promise<void> {
         try {
             const channel = await findTodoChannel(message.message.guildId ?? '', message.message.channelId);
             if (channel && message.count === 0) {
-                if (message.message.type === 'REPLY') {
+                if (message.message.type === MessageType.Reply) {
                     const refMessage = await message.message.channel.messages.fetch(message.message.reference?.messageId ?? '');
                     if (refMessage) {
                         await refMessage?.reactions?.resolve('👍')?.remove();
