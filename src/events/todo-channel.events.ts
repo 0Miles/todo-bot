@@ -1,10 +1,10 @@
-import { Message, MessageType, TextChannel } from 'discord.js';
+import { Message, MessageType } from 'discord.js';
 import type { ArgsOf, Client } from 'discordx';
 import { Discord, On } from 'discordx';
 import { findTodoChannel, addTodoMessage, removeTodoMessage, getChannelTodoMessages } from '../db.js';
 
 @Discord()
-export class TodoEvents {
+export class TodoChannelEvents {
 
     async loadTodoMessage(message: Message) {
         const todoMessageIds = await getChannelTodoMessages(message.guildId ?? '', message.channelId);

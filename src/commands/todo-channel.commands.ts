@@ -6,27 +6,21 @@ import { Discord, Slash, SlashGroup } from 'discordx';
 @SlashGroup({ description: 'Manage todo list channel', name: 'todo-channel', defaultMemberPermissions: '16' })
 @SlashGroup('todo-channel')
 export class TodoChannelCommands {
-    async watchChannel(command: CommandInteraction | Message): Promise<void> {
-        await addTodoChannel(command.guildId ?? '', command.channelId);
-        await command.reply('Watch channel ``' + command.channelId + '``.');
-    }
 
     @Slash({ name: 'watch', description: 'Watch this channel as a todo list' })
-    slashWatchChannel(command: CommandInteraction): void {
-        this.watchChannel(command);
-    }
-
-    async stopWatchChannel(command: CommandInteraction | Message): Promise<void> {
-        await removeTodoChannel(command.guildId ?? '', command.channelId);
-        await command.reply('Stop watching Channel ``' + command.channelId + '``.');
+    async slashWatchChannel(command: CommandInteraction): Promise<void> {
+        await addTodoChannel(command.guildId ?? '', command.channelId);
+        await command.reply({ content: 'Watch channel ``' + command.channelId + '``.', flags: 'Ephemeral' });
     }
 
     @Slash({ name: 'stop-watch', description: 'Stop watching this channel as a todo list' })
-    slashStopWatchChannel(command: CommandInteraction): void {
-        this.stopWatchChannel(command);
+    async slashStopWatchChannel(command: CommandInteraction): Promise<void> {
+        await removeTodoChannel(command.guildId ?? '', command.channelId);
+        await command.reply({ content: 'Stop watching Channel ``' + command.channelId + '``.', flags: 'Ephemeral' });
     }
 
-    async checkCacheMessage(command: CommandInteraction | Message) {
+    @Slash({ name: 'check-cache', description: 'Check the cache for todo messages' })
+    async slashCheckCacheMessage(command: CommandInteraction): Promise<void> {
         const channel = command.client.channels.cache.get(command.channelId) as TextChannel;
         const messages = await channel.messages.fetch({
             limit: 100,
@@ -43,11 +37,6 @@ export class TodoChannelCommands {
         for (const eachMessage of filteredMessage) {
             await addTodoMessage(eachMessage);
         }
-        await command.reply('Checked.');
-    }
-
-    @Slash({ name: 'check-cache', description: 'Check the cache for todo messages' })
-    slashCheckCacheMessage(command: CommandInteraction): void {
-        this.checkCacheMessage(command);
+        await command.reply({ content: 'Checked.', flags: 'Ephemeral' });
     }
 }
