@@ -8,19 +8,19 @@ import { Discord, Slash, SlashGroup } from 'discordx';
 export class TodoChannelCommands {
 
     @Slash({ name: 'watch', description: 'Watch this channel as a todo list' })
-    async slashWatchChannel(command: CommandInteraction): Promise<void> {
+    async watchChannel(command: CommandInteraction): Promise<void> {
         await addTodoChannel(command.guildId ?? '', command.channelId);
         await command.reply({ content: 'Watch channel ``' + command.channelId + '``.', flags: 'Ephemeral' });
     }
 
     @Slash({ name: 'stop-watch', description: 'Stop watching this channel as a todo list' })
-    async slashStopWatchChannel(command: CommandInteraction): Promise<void> {
+    async stopWatchChannel(command: CommandInteraction): Promise<void> {
         await removeTodoChannel(command.guildId ?? '', command.channelId);
         await command.reply({ content: 'Stop watching Channel ``' + command.channelId + '``.', flags: 'Ephemeral' });
     }
 
     @Slash({ name: 'check-cache', description: 'Check the cache for todo messages' })
-    async slashCheckCacheMessage(command: CommandInteraction): Promise<void> {
+    async checkCacheMessage(command: CommandInteraction): Promise<void> {
         const channel = command.client.channels.cache.get(command.channelId) as TextChannel;
         const messages = await channel.messages.fetch({
             limit: 100,
