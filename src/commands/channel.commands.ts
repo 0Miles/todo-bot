@@ -9,12 +9,7 @@ export class ChannelCommands {
         await command.reply('Watch channel ``' + command.channelId + '``.');
     }
 
-    @SimpleCommand({ name: 'watch-channel' })
-    simpleWatchChannel(command: SimpleCommandMessage): void {
-        this.watchChannel(command.message);
-    }
-
-    @Slash({ name: 'watch-channel', description: 'watch-channel' })
+    @Slash({ name: 'watch-channel', description: 'watch-channel', defaultMemberPermissions: '16' })
     slashWatchChannel(command: CommandInteraction): void {
         this.watchChannel(command);
     }
@@ -24,12 +19,7 @@ export class ChannelCommands {
         await command.reply('Stop watching Channel ``' + command.channelId + '``.');
     }
 
-    @SimpleCommand({ name: 'stop-watch-channel' })
-    simpleStopWatchChannel(command: SimpleCommandMessage): void {
-        this.stopWatchChannel(command.message);
-    }
-
-    @Slash({ name: 'stop-watch-channel', description: 'stop-watch-channel' })
+    @Slash({ name: 'stop-watch-channel', description: 'stop-watch-channel', defaultMemberPermissions: '16' })
     slashStopWatchChannel(command: CommandInteraction): void {
         this.stopWatchChannel(command);
     }
@@ -54,12 +44,7 @@ export class ChannelCommands {
         await command.reply('Checked.');
     }
 
-    @SimpleCommand({ name: 'check-cache' })
-    simpleCheckCacheMessage(command: SimpleCommandMessage): void {
-        this.checkCacheMessage(command.message);
-    }
-
-    @Slash({ name: 'check-cache', description: 'check-cache' })
+    @Slash({ name: 'check-cache', description: 'check-cache', defaultMemberPermissions: '16' })
     slashCheckCacheMessage(command: CommandInteraction): void {
         this.checkCacheMessage(command);
     }
