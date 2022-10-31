@@ -1,7 +1,8 @@
 import { Message, MessageType } from 'discord.js';
 import type { ArgsOf, Client } from 'discordx';
 import { Discord, On } from 'discordx';
-import { findTodoChannel, addTodoMessage, removeTodoMessage, getChannelTodoMessages } from '../db.js';
+import { findTodoChannel } from '../models/todo-channel.model.js'
+import { addTodoMessage, removeTodoMessage, getChannelTodoMessages } from '../models/todo-message.model.js';
 
 @Discord()
 export class TodoChannelEvents {

@@ -4,6 +4,7 @@ import { dirname, importx } from '@discordx/importer';
 import type { Interaction, Message } from 'discord.js';
 import { IntentsBitField } from 'discord.js';
 import { Client } from 'discordx';
+import { sequelize } from './models/db.js';
 
 export const bot = new Client({
     botGuilds: [(client) => client.guilds.cache.map((guild) => guild.id)],
@@ -42,6 +43,7 @@ bot.on('messageCreate', async (message: Message) => {
 async function run() {
     try {
         await importx(dirname(import.meta.url) + '/{events,commands}/**/*.{ts,js}');
+        await sequelize.sync();
         await bot.login(process.env.BOT_TOKEN ?? '');
     } catch (ex) {
         console.error(ex);

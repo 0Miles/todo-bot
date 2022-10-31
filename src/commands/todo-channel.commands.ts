@@ -1,5 +1,6 @@
-import { addTodoChannel, addTodoMessage, removeTodoChannel } from '../db.js';
-import { CommandInteraction, Message, TextChannel, MessageType } from 'discord.js';
+import { addTodoMessage } from '../models/todo-message.model.js';
+import { addTodoChannel, removeTodoChannel } from '../models/todo-channel.model.js';
+import { CommandInteraction, TextChannel, MessageType } from 'discord.js';
 import { Discord, Slash, SlashGroup } from 'discordx';
 
 @Discord()

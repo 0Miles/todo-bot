@@ -1,14 +1,6 @@
 import { Message } from 'discord.js';
-import { Sequelize, DataTypes } from 'sequelize';
-
-const sequelize = new Sequelize({
-    username: 'root',
-    password: 'root',
-    storage: 'storage.sqlite',
-    host: 'localhost',
-    dialect: 'sqlite',
-    logging: false
-});
+import { DataTypes } from 'sequelize';
+import { sequelize } from './db.js';
 
 export const TodoMessage = sequelize.define('TodoMessage', {
     messageId: DataTypes.STRING,
@@ -16,42 +8,6 @@ export const TodoMessage = sequelize.define('TodoMessage', {
     guildId: DataTypes.STRING,
     createdAt: DataTypes.DATE
 });
-
-export const TodoChannel = sequelize.define('TodoChannel', {
-    channelId: DataTypes.STRING,
-    guildId: DataTypes.STRING
-});
-
-await sequelize.sync();
-
-export const getTodoChannels = async () => {
-    return await TodoChannel.findAll();
-}
-
-export const findTodoChannel = async (guildId: string, channelId: string) => {
-    return await TodoChannel.findOne({
-        where: {
-            channelId: channelId,
-            guildId: guildId
-        }
-    });
-}
-
-export const addTodoChannel = async (guildId: string, channelId: string) => {
-    await TodoChannel.create({
-        channelId: channelId,
-        guildId: guildId
-    });
-}
-
-export const removeTodoChannel = async (guildId: string, channelId: string) => {
-    await TodoChannel.destroy({
-        where: {
-            channelId: channelId,
-            guildId: guildId
-        }
-    });
-}
 
 export const addTodoMessage = async (message: Message) => {
     await TodoMessage.findOrCreate({
