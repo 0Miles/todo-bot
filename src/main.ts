@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 
 import { dirname, importx } from '@discordx/importer';
-import type { Interaction, Message } from 'discord.js';
+import type { Guild, Interaction, Message } from 'discord.js';
 import { IntentsBitField, Partials } from 'discord.js';
 import { Client } from 'discordx';
 import { sequelize } from './models/db.js';
@@ -35,6 +35,10 @@ bot.once('ready', async () => {
     await bot.initApplicationCommands();
 
     console.log('Bot started');
+});
+
+bot.on('guildCreate', async (guild: Guild) => {
+    await bot.initGuildApplicationCommands(guild.id, bot.applicationCommandSlashes as any);
 });
 
 bot.on('interactionCreate', (interaction: Interaction) => {
