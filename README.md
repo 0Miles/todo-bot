@@ -2,7 +2,7 @@
 <img src="https://i.imgur.com/1YbH4xE.gif" width="180">
 
 ## Overview
-Todo list bot.  
+Discord todo list bot.  
 There may be other features.
   
 ## Getting Started
