@@ -2,13 +2,15 @@ import { DataTypes } from 'sequelize';
 import { sequelize } from './db.js';
 
 export const TodoChannel = sequelize.define('TodoChannel', {
-    channelId: DataTypes.STRING,
-    guildId: DataTypes.STRING
+    channelId: {
+        type: DataTypes.STRING,
+        primaryKey: true
+    },
+    guildId: {
+        type: DataTypes.STRING,
+        primaryKey: true
+    }
 });
-
-export const getTodoChannels = async () => {
-    return await TodoChannel.findAll();
-}
 
 export const findTodoChannel = async (guildId: string, channelId: string) => {
     return await TodoChannel.findOne({

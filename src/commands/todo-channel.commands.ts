@@ -1,5 +1,5 @@
 import { addTodoMessage } from '../models/todo-message.model.js';
-import { addTodoChannel, removeTodoChannel } from '../models/todo-channel.model.js';
+import { addTodoChannel, findTodoChannel, removeTodoChannel } from '../models/todo-channel.model.js';
 import { CommandInteraction, TextChannel, MessageType } from 'discord.js';
 import { Discord, Slash, SlashGroup } from 'discordx';
 
@@ -10,14 +10,24 @@ export class TodoChannelCommands {
 
     @Slash({ name: 'watch', description: 'Watch this channel as a todo list' })
     async watchChannel(command: CommandInteraction): Promise<void> {
-        await addTodoChannel(command.guildId ?? '', command.channelId);
-        await command.reply({ content: 'Watch channel ``' + command.channelId + '``.', flags: 'Ephemeral' });
+        const recordedTodoChannel = await findTodoChannel(command.guildId as string, command.channelId);
+        if (!recordedTodoChannel) {
+            await addTodoChannel(command.guildId as string, command.channelId);
+            await command.reply({ content: `Channel \`\`${command.channelId}\`\` watched.`, flags: 'Ephemeral' });
+        } else {
+            await command.reply({ content: `Channel \`\`${command.channelId}\`\` has been watched.`, flags: 'Ephemeral' });
+        }        
     }
 
     @Slash({ name: 'stop-watch', description: 'Stop watching this channel as a todo list' })
     async stopWatchChannel(command: CommandInteraction): Promise<void> {
-        await removeTodoChannel(command.guildId ?? '', command.channelId);
-        await command.reply({ content: 'Stop watching Channel ``' + command.channelId + '``.', flags: 'Ephemeral' });
+        const recordedTodoChannel = await findTodoChannel(command.guildId as string, command.channelId);
+        if (recordedTodoChannel) {
+            await removeTodoChannel(command.guildId as string, command.channelId);
+            await command.reply({ content: `Channel \`\`${command.channelId}\`\` has stopped watch.`, flags: 'Ephemeral' });
+        } else {
+            await command.reply({ content: `Channel \`\`${command.channelId}\`\` not watched.`, flags: 'Ephemeral' });
+        }
     }
 
     @Slash({ name: 'check-cache', description: 'Check the cache for todo messages' })

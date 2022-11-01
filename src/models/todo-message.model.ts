@@ -3,9 +3,18 @@ import { DataTypes } from 'sequelize';
 import { sequelize } from './db.js';
 
 export const TodoMessage = sequelize.define('TodoMessage', {
-    messageId: DataTypes.STRING,
-    channelId: DataTypes.STRING,
-    guildId: DataTypes.STRING,
+    messageId: {
+        type: DataTypes.STRING,
+        primaryKey: true
+    },
+    channelId: {
+        type: DataTypes.STRING,
+        primaryKey: true
+    },
+    guildId: {
+        type: DataTypes.STRING,
+        primaryKey: true
+    },
     createdAt: DataTypes.DATE
 });
 
@@ -35,7 +44,7 @@ export const removeTodoMessage = async (guildId: string, channelId: string, mess
     });
 }
 
-export const getChannelTodoMessages = async (guildId: string, channelId: string) => {
+export const findChannelTodoMessages = async (guildId: string, channelId: string) => {
     return await TodoMessage.findAll({
         where: {
             channelId: channelId,
