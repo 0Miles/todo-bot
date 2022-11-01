@@ -1,8 +1,5 @@
 # Todo Karyl
-  
-<div style="text-align:center">
-    <img src="https://i.imgur.com/1YbH4xE.gif" width="180">
-</div>
+<img src="https://i.imgur.com/1YbH4xE.gif" width="180">
 
 ## Overview
 Todo list bot.  
@@ -35,25 +32,17 @@ A message that mentions someone is considered a todo, and any reaction emoji is 
 Mention the bot when you want to see undone todos and it will pull all undone todos to channel bottom.
 
 ### Commands
- - ``/todo-channel watch``  
-    Watch the current Channel as a todo list.  
- - ``/todo-channel stop-watch``  
-    Stop watching the current channel as a todo list.
- - ``/todo-channel check-cache``  
-    Check cache message.
+ - ``/todo-channel watch`` Watch the current Channel as a todo list.  
+ - ``/todo-channel stop-watch`` Stop watching the current channel as a todo list.
+ - ``/todo-channel check-cache`` Check cache message.
   
 
 ## Role emoji
 Allows guild members to acquire desired roles by attaching reaction emoji to designated message.  
 
 ### Commands
- - ``role-emoji add``  
-    Add a new role emoji.  
- - ``role-emoji remove``  
-    Remove a role emoji.
- - ``role-emoji list``  
-    List all role emoji.
- - ``role-emoji watch-message``  
-    Watch a message's reactions.
- - ``role-emoji stop-watch-message``  
-    Stop watching a message's reactions.
+ - ``/role-emoji add`` Add a new role emoji.  
+ - ``/role-emoji remove`` Remove a role emoji.
+ - ``/role-emoji list`` List all role emoji.
+ - ``/role-emoji watch-message`` Watch a message's reactions.
+ - ``/role-emoji stop-watch-message`` Stop watching a message's reactions.
