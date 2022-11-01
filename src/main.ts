@@ -2,7 +2,7 @@ import 'reflect-metadata';
 
 import { dirname, importx } from '@discordx/importer';
 import type { Interaction, Message } from 'discord.js';
-import { IntentsBitField } from 'discord.js';
+import { IntentsBitField, Partials } from 'discord.js';
 import { Client } from 'discordx';
 import { sequelize } from './models/db.js';
 
@@ -16,6 +16,11 @@ export const bot = new Client({
         IntentsBitField.Flags.GuildMessageReactions,
         IntentsBitField.Flags.GuildVoiceStates,
         IntentsBitField.Flags.MessageContent
+    ],
+    partials: [
+        Partials.Message,
+        Partials.Channel,
+        Partials.Reaction
     ],
 
     silent: false,
