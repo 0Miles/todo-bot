@@ -28,8 +28,8 @@ npm start
 
 ## Todo channel
 Use discord channel as a todo list.  
-A message that mentions someone is considered a todo, and any reaction emoji is given to indicate that the todo is done.  
-Mention the bot when you want to see undone todos and it will pull all undone todos to channel bottom.
+A message that mentions someone is considered a todo, and any reaction emoji is attached to the message to indicate that the todo is done.  
+Mention the bot when you want to see undone todos. The bot will pull all undone todos to channel bottom.
 
 ### Commands
  - ``/todo-channel watch`` Watch the current Channel as a todo list.  
