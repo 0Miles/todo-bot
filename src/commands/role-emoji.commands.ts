@@ -105,12 +105,12 @@ export class RoleEmojiCommands {
             const message = await command.channel?.messages.fetch({ message: messageId });
             if (message) {
                 const recordedRoleReceiveMessage = await findRoleReceiveMessage(command.guildId as string, command.channelId, messageId);
+                const allRoleEmojis = await findGuildAllRoleEmojis(command.guildId as string);
+                for (const emojiIdOrChar of allRoleEmojis.map(x => x.getDataValue('emojiChar') ? x.getDataValue('emojiChar') : x.getDataValue('emojiId'))) {
+                    const emoji = command.guild?.emojis.resolve(emojiIdOrChar);
+                    await message.react(emoji ?? emojiIdOrChar);
+                }
                 if (!recordedRoleReceiveMessage) {
-                    const allRoleEmojis = await findGuildAllRoleEmojis(command.guildId as string);
-                    for (const emojiIdOrChar of allRoleEmojis.map(x => x.getDataValue('emojiChar') ? x.getDataValue('emojiChar') : x.getDataValue('emojiId'))) {
-                        const emoji = command.guild?.emojis.resolve(emojiIdOrChar);
-                        await message.react(emoji ?? emojiIdOrChar);
-                    }
                     await addRoleReceiveMessage(command.guildId as string, command.channelId, messageId);
                     await command.reply({ content: `Message \`\`${messageId}\`\` watched.`, flags: 'Ephemeral' });
                 } else {
