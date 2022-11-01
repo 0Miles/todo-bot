@@ -83,7 +83,7 @@ export class RoleEmojiCommands {
         await command.reply({ content: result, flags: 'Ephemeral' });
     }
 
-    @Slash({ name: 'watch-message', description: 'Watch a message\'s reaction' })
+    @Slash({ name: 'watch-message', description: 'Watch a message\'s reactions' })
     async watchMessage(
         @SlashOption({
             description: "Message ID",
@@ -112,7 +112,7 @@ export class RoleEmojiCommands {
         }        
     }
 
-    @Slash({ name: 'stop-watch-message', description: 'Stop watching a message\'s reaction' })
+    @Slash({ name: 'stop-watch-message', description: 'Stop watching a message\'s reactions' })
     async stopWatchMessage(
         @SlashOption({
             description: "Message ID",
