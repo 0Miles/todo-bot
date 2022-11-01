@@ -1,5 +1,5 @@
 import { findRoleEmoji } from './../models/role-emoji.model.js';
-import { MessageReaction, PartialMessageReaction } from 'discord.js';
+import { MessageReaction, PartialMessageReaction, User } from 'discord.js';
 import type { ArgsOf, Client } from 'discordx';
 import { Discord, On } from 'discordx';
 import { findRoleReceiveMessage } from '../models/role-receive-message.model.js';
@@ -16,15 +16,15 @@ async function getRoldByMessageReaction(messageReaction: MessageReaction | Parti
 
 @Discord()
 export class RoleEmojiEvents {
-
-
     @On()
-    async messageReactionAdd([messageReaction]: ArgsOf<'messageReactionAdd'>, client: Client): Promise<void> {
+    async messageReactionAdd([messageReaction, user]: ArgsOf<'messageReactionAdd'>, client: Client): Promise<void> {
         try {
-            const role = await getRoldByMessageReaction(messageReaction);
-            if (role) {
-                const fullMessage = await messageReaction.message.channel?.messages.fetch({ message: messageReaction.message.id });
-                await fullMessage.member?.roles.add(role);
+            if (user.id !== client.user?.id) {
+                const role = await getRoldByMessageReaction(messageReaction);
+                if (role) {
+                    const member = await messageReaction.message.guild?.members.cache.find(x => x.id === user.id);
+                    await member?.roles.add(role);
+                }
             }
         } catch (ex) {
             console.error(ex);
@@ -33,13 +33,16 @@ export class RoleEmojiEvents {
 
 
     @On()
-    async messageReactionRemove([messageReaction]: ArgsOf<'messageReactionRemove'>, client: Client): Promise<void> {
+    async messageReactionRemove([messageReaction, user]: ArgsOf<'messageReactionRemove'>, client: Client): Promise<void> {
         try {
-            const role = await getRoldByMessageReaction(messageReaction);
-            if (role) {
-                const fullMessage = await messageReaction.message.channel?.messages.fetch({ message: messageReaction.message.id });
-                await fullMessage.member?.roles.remove(role);
+            if (user.id !== client.user?.id) {
+                const role = await getRoldByMessageReaction(messageReaction);
+                if (role) {
+                    const member = await messageReaction.message.guild?.members.cache.find(x => x.id === user.id);
+                    await member?.roles.remove(role);
+                }
             }
+            
         } catch (ex) {
             console.error(ex);
         }
