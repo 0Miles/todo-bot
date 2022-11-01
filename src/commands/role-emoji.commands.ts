@@ -86,7 +86,7 @@ export class RoleEmojiCommands {
                     }
                 })
                 .join('\n');
-            await command.reply({ content: result, flags: 'Ephemeral' });
+            await command.reply({ content: result ? result : 'No role emoji.', flags: 'Ephemeral' });
         } catch (ex) {
             console.error(ex);
         }
