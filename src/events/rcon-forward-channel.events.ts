@@ -1,9 +1,10 @@
 import type { ArgsOf, Client } from 'discordx';
 import { Discord, On } from 'discordx';
 import { RconForwardChannel } from '../models/rcon-forward-channel.model.js';
-import Rcon from 'rcon';
 import { Message } from 'discord.js';
 import { FAILED_COLOR, SUCCEEDED_COLOR } from '../utils/constant.js';
+// @ts-ignore
+import Rcon from 'rcon';
 
 const connectionMap: any = {};
 
