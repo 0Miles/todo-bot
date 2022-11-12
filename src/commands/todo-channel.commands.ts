@@ -1,6 +1,6 @@
 import { SUCCEEDED_COLOR } from './../utils/constant.js';
 import { addTodoMessage } from '../models/todo-message.model.js';
-import { addTodoChannel, findTodoChannel, removeTodoChannel } from '../models/todo-channel.model.js';
+import { addTodoChannel, findTodoChannel } from '../models/todo-channel.model.js';
 import { CommandInteraction, TextChannel, MessageType } from 'discord.js';
 import { Discord, Slash, SlashGroup } from 'discordx';
 
@@ -38,7 +38,7 @@ export class TodoChannelCommands {
     async stopWatchChannel(command: CommandInteraction): Promise<void> {
         const recordedTodoChannel = await findTodoChannel(command.guildId as string, command.channelId);
         if (recordedTodoChannel) {
-            await removeTodoChannel(command.guildId as string, command.channelId);
+            await recordedTodoChannel.destroy();
             await command.reply({
                 embeds: [{
                     color: SUCCEEDED_COLOR,

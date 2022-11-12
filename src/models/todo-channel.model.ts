@@ -27,12 +27,3 @@ export const addTodoChannel = async (guildId: string, channelId: string) => {
         guildId: guildId
     });
 }
-
-export const removeTodoChannel = async (guildId: string, channelId: string) => {
-    await TodoChannel.destroy({
-        where: {
-            channelId: channelId,
-            guildId: guildId
-        }
-    });
-}
