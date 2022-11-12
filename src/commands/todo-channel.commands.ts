@@ -1,3 +1,4 @@
+import { SUCCEEDED_COLOR } from './../utils/constant.js';
 import { addTodoMessage } from '../models/todo-message.model.js';
 import { addTodoChannel, findTodoChannel, removeTodoChannel } from '../models/todo-channel.model.js';
 import { CommandInteraction, TextChannel, MessageType } from 'discord.js';
@@ -13,9 +14,23 @@ export class TodoChannelCommands {
         const recordedTodoChannel = await findTodoChannel(command.guildId as string, command.channelId);
         if (!recordedTodoChannel) {
             await addTodoChannel(command.guildId as string, command.channelId);
-            await command.reply({ content: `Channel \`\`${command.channelId}\`\` watched.`, flags: 'Ephemeral' });
+            await command.reply({
+                embeds: [{
+                    color: SUCCEEDED_COLOR,
+                    title: `Succeeded`,
+                    description: `Current channel is being watched.`
+                }],
+                flags: 'Ephemeral'
+            });
         } else {
-            await command.reply({ content: `Channel \`\`${command.channelId}\`\` has been watched.`, flags: 'Ephemeral' });
+            await command.reply({
+                embeds: [{
+                    color: SUCCEEDED_COLOR,
+                    title: `No action`,
+                    description: `Current channel has been watched.`
+                }],
+                flags: 'Ephemeral'
+            });
         }        
     }
 
@@ -24,9 +39,23 @@ export class TodoChannelCommands {
         const recordedTodoChannel = await findTodoChannel(command.guildId as string, command.channelId);
         if (recordedTodoChannel) {
             await removeTodoChannel(command.guildId as string, command.channelId);
-            await command.reply({ content: `Channel \`\`${command.channelId}\`\` has stopped watch.`, flags: 'Ephemeral' });
+            await command.reply({
+                embeds: [{
+                    color: SUCCEEDED_COLOR,
+                    title: `Succeeded`,
+                    description: `Current channel is no longer being watched.`
+                }],
+                flags: 'Ephemeral'
+            });
         } else {
-            await command.reply({ content: `Channel \`\`${command.channelId}\`\` not watched.`, flags: 'Ephemeral' });
+            await command.reply({
+                embeds: [{
+                    color: SUCCEEDED_COLOR,
+                    title: `No action`,
+                    description: `Current channel is not being watched.`
+                }],
+                flags: 'Ephemeral'
+            });
         }
     }
 
@@ -48,6 +77,12 @@ export class TodoChannelCommands {
         for (const eachMessage of filteredMessage) {
             await addTodoMessage(eachMessage);
         }
-        await command.reply({ content: 'Checked.', flags: 'Ephemeral' });
+        await command.reply({
+            embeds: [{
+                color: SUCCEEDED_COLOR,
+                title: `Checked`
+            }],
+            flags: 'Ephemeral'
+        });
     }
 }

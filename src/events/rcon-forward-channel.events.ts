@@ -3,6 +3,7 @@ import { Discord, On } from 'discordx';
 import { RconForwardChannel } from '../models/rcon-forward-channel.model.js';
 import Rcon from 'rcon';
 import { Message } from 'discord.js';
+import { FAILED_COLOR, SUCCEEDED_COLOR } from '../utils/constant.js';
 
 const connectionMap: any = {};
 
@@ -24,14 +25,14 @@ const send = (message: Message, host: string, port: number, password: string, co
         }).on('response', (str: string) => {
             connectionMap[connectionName].channel.send({
                 embeds: [{
-                    color: 0x00FFFF,
+                    color: SUCCEEDED_COLOR,
                     title: str
                 }]
             });
         }).on('error', (err: Error) => {
             connectionMap[connectionName].channel.send({
                 embeds: [{
-                    color: 0xFF0000,
+                    color: FAILED_COLOR,
                     title: err.message
                 }]
             });

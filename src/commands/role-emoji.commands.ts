@@ -1,3 +1,4 @@
+import { FAILED_COLOR, SUCCEEDED_COLOR } from './../utils/constant.js';
 import { CommandInteraction, ApplicationCommandOptionType, Role } from 'discord.js';
 import { Discord, Slash, SlashGroup, SlashOption } from 'discordx';
 import { addRoleEmoji, removeRoleEmoji, findRoleEmoji, findGuildAllRoleEmojis } from '../models/role-emoji.model.js';
@@ -30,10 +31,24 @@ export class RoleEmojiCommands {
                 const recordedRoleEmoji = await findRoleEmoji(command.guildId as string, emojiMatch[1] ?? '', emojiMatch[3] ?? '');
                 if (!recordedRoleEmoji) {
                     await addRoleEmoji(command.guildId as string, role.id, emojiMatch[1] ?? '', emojiMatch[2] ?? '', emojiMatch[3] ?? '')
-                    await command.reply({ content: `${emoji} = \`\`${role.name}\`\` added.`, flags: 'Ephemeral' });
+                    await command.reply({
+                        embeds: [{
+                            color: SUCCEEDED_COLOR,
+                            title: `Succeeded`,
+                            description: `${emoji} = \`\`${role.name}\`\``
+                        }],
+                        flags: 'Ephemeral'
+                    });
                 } else {
                     const mappedRole = command.guild?.roles.cache.find(x => x.id === recordedRoleEmoji.getDataValue('roleId'));
-                    await command.reply({ content: `${emoji} has been mapped by \`\`${mappedRole?.name}\`\`.`, flags: 'Ephemeral' });
+                    await command.reply({
+                        embeds: [{
+                            color: FAILED_COLOR,
+                            title: `Failed`,
+                            description: `${emoji} has been mapped by \`\`${mappedRole?.name}\`\`.`
+                        }],
+                        flags: 'Ephemeral'
+                    });
                 }
             }
         } catch (ex) {
@@ -57,11 +72,24 @@ export class RoleEmojiCommands {
             } else {
                 const recordedRoleEmoji = await findRoleEmoji(command.guildId as string, emojiMatch[1] ?? '', emojiMatch[3] ?? '');
                 if (recordedRoleEmoji) {
-                    const mappedRole = command.guild?.roles.cache.find(x => x.id === recordedRoleEmoji.getDataValue('roleId'));
                     await removeRoleEmoji(command.guildId as string, emojiMatch[1] ?? '', emojiMatch[3] ?? '')
-                    await command.reply({ content: `${emoji} = \`\`${mappedRole?.name}\`\` removed.`, flags: 'Ephemeral' });
+                    await command.reply({
+                        embeds: [{
+                            color: SUCCEEDED_COLOR,
+                            title: `Succeeded`,
+                            description: `${emoji} has been removed.`
+                        }],
+                        flags: 'Ephemeral'
+                    });
                 } else {
-                    await command.reply({ content: `No records found for ${emoji}.`, flags: 'Ephemeral' });
+                    await command.reply({
+                        embeds: [{
+                            color: FAILED_COLOR,
+                            title: `Failed`,
+                            description: `No records found for ${emoji}.`
+                        }],
+                        flags: 'Ephemeral'
+                    });
                 }
             }
         } catch (ex) {
@@ -80,13 +108,25 @@ export class RoleEmojiCommands {
                     const emojiName = x.getDataValue('emojiName');
                     const mappedRole = command.guild?.roles.cache.find(eachRole => eachRole.id === x.getDataValue('roleId'));
                     if (emojiChar) {
-                        return `${emojiChar} = \`\`${mappedRole?.name}\`\``
+                        return {
+                            name: `${emojiChar}`,
+                            value: mappedRole?.name ?? ''
+                        }
                     } else {
-                        return `<${emojiName}${emojiId}> = \`\`${mappedRole?.name}\`\``
+                        return {
+                            name: `<${emojiName}${emojiId}>`,
+                            value: mappedRole?.name ?? ''
+                        }
                     }
-                })
-                .join('\n');
-            await command.reply({ content: result ? result : 'No role emoji.', flags: 'Ephemeral' });
+                });
+            await command.reply({
+                embeds: [{
+                    color: SUCCEEDED_COLOR,
+                    description: result.length ? undefined : 'No role emoji.',
+                    fields: result
+                }],
+                flags: 'Ephemeral'
+            });
         } catch (ex) {
             console.error(ex);
         }
@@ -112,12 +152,33 @@ export class RoleEmojiCommands {
                 }
                 if (!recordedRoleReceiveMessage) {
                     await addRoleReceiveMessage(command.guildId as string, command.channelId, messageId);
-                    await command.reply({ content: `Message \`\`${messageId}\`\` watched.`, flags: 'Ephemeral' });
+                    await command.reply({
+                        embeds: [{
+                            color: SUCCEEDED_COLOR,
+                            title: `Succeeded`,
+                            description: `Message \`\`${messageId}\`\` is being watched.`
+                        }],
+                        flags: 'Ephemeral'
+                    });
                 } else {
-                    await command.reply({ content: `Message \`\`${messageId}\`\` has been watched.`, flags: 'Ephemeral' });
+                    await command.reply({
+                        embeds: [{
+                            color: SUCCEEDED_COLOR,
+                            title: `No action`,
+                            description: `Message \`\`${messageId}\`\` is already in the watch list.`
+                        }],
+                        flags: 'Ephemeral'
+                    });
                 }
             } else {
-                await command.reply({ content: `Message \`\`${messageId}\`\` does not exist.`, flags: 'Ephemeral' });
+                await command.reply({
+                    embeds: [{
+                        color: FAILED_COLOR,
+                        title: `Failed`,
+                        description: `Message \`\`${messageId}\`\` does not exist.`
+                    }],
+                    flags: 'Ephemeral'
+                });
             }
         } catch (ex) {
             console.error(ex);
@@ -139,12 +200,33 @@ export class RoleEmojiCommands {
                 const recordedRoleReceiveMessage = await findRoleReceiveMessage(command.guildId as string, command.channelId, messageId);
                 if (recordedRoleReceiveMessage) {
                     await removeRoleReceiveMessage(command.guildId as string, command.channelId, messageId);
-                    await command.reply({ content: `Message \`\`${messageId}\`\` has stopped watch.`, flags: 'Ephemeral' });
+                    await command.reply({
+                        embeds: [{
+                            color: SUCCEEDED_COLOR,
+                            title: `Succeeded`,
+                            description: `Message \`\`${messageId}\`\` is no longer being watched.`
+                        }],
+                        flags: 'Ephemeral'
+                    });
                 } else {
-                    await command.reply({ content: `Message \`\`${messageId}\`\` not watched.`, flags: 'Ephemeral' });
+                    await command.reply({
+                        embeds: [{
+                            color: SUCCEEDED_COLOR,
+                            title: `No action`,
+                            description: `Message \`\`${messageId}\`\`  is not being watched.`
+                        }],
+                        flags: 'Ephemeral'
+                    });
                 }
             } else {
-                await command.reply({ content: `Message \`\`${messageId}\`\` does not exist.`, flags: 'Ephemeral' });
+                await command.reply({
+                    embeds: [{
+                        color: FAILED_COLOR,
+                        title: `Failed`,
+                        description: `Message \`\`${messageId}\`\` does not exist.`
+                    }],
+                    flags: 'Ephemeral'
+                });
             }
         } catch (ex) {
             console.error(ex);

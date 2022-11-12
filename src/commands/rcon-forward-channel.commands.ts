@@ -1,6 +1,7 @@
 import { RconForwardChannel } from './../models/rcon-forward-channel.model.js';
-import { CommandInteraction, TextChannel, MessageType, ModalBuilder, ModalSubmitInteraction, TextInputBuilder, TextInputStyle, ActionRowBuilder, ApplicationCommandOptionType, Interaction } from 'discord.js';
-import { Discord, ModalComponent, Slash, SlashGroup, SlashOption } from 'discordx';
+import { CommandInteraction, ModalBuilder, ModalSubmitInteraction, TextInputBuilder, TextInputStyle, ActionRowBuilder } from 'discord.js';
+import { Discord, ModalComponent, Slash, SlashGroup } from 'discordx';
+import { FAILED_COLOR, SUCCEEDED_COLOR } from '../utils/constant.js';
 
 @Discord()
 @SlashGroup({ description: 'Manage rcon forward channel', name: 'rcon-forward-channel', defaultMemberPermissions: '16' })
@@ -67,7 +68,14 @@ export class RconForwardChannelCommands {
 
             command.showModal(modal);
         } else {
-            await command.reply({ content: `Channel \`\`${command.channelId}\`\` has been watched.`, flags: 'Ephemeral' });
+            await command.reply({
+                embeds: [{
+                    color: SUCCEEDED_COLOR,
+                    title: `No action`,
+                    description: `Current channel is already in the watch list.`
+                }],
+                flags: 'Ephemeral'
+            });
         }
     }
 
@@ -77,15 +85,14 @@ export class RconForwardChannelCommands {
             let [triggerPrefix, commandPrefix, host, portString, password] = ['fieldTriggerPrefix', 'fieldCommandPrefix', 'fieldHost', 'fieldPort', 'fieldPassword'].map((id) =>
                 interaction.fields.getTextInputValue(id)
             );
-    
+
             const existingRecord = await RconForwardChannel.findOne({
                 where: {
                     channelId: interaction.channelId,
                     guildId: interaction.guildId
                 }
             });
-            const updateObj: any = {};
-
+            
             if (!existingRecord) {
                 await RconForwardChannel.create({
                     channelId: interaction.channelId,
@@ -117,8 +124,8 @@ export class RconForwardChannelCommands {
                 host,
                 portString,
                 password,
-                );
-    
+            );
+
             return;
         } catch (ex) {
             console.error(ex);
@@ -129,7 +136,7 @@ export class RconForwardChannelCommands {
         await interaction.reply({
             flags: 'Ephemeral',
             embeds: [{
-                color: 0x00FFFF,
+                color: SUCCEEDED_COLOR,
                 fields: [
                     {
                         name: `Trigger prefix`,
@@ -166,9 +173,23 @@ export class RconForwardChannelCommands {
         });
         if (existingRecord) {
             await existingRecord.destroy();
-            await command.reply({ content: `Channel \`\`${command.channelId}\`\` has stopped watch.`, flags: 'Ephemeral' });
+            await command.reply({
+                embeds: [{
+                    color: SUCCEEDED_COLOR,
+                    title: `Succeeded`,
+                    description: `Current channel is no longer being watched.`
+                }],
+                flags: 'Ephemeral'
+            });
         } else {
-            await command.reply({ content: `Channel \`\`${command.channelId}\`\` not watched.`, flags: 'Ephemeral' });
+            await command.reply({
+                embeds: [{
+                    color: SUCCEEDED_COLOR,
+                    title: `No action`,
+                    description: `Current channel is not being watched.`
+                }],
+                flags: 'Ephemeral'
+            });
         }
     }
 
@@ -183,13 +204,19 @@ export class RconForwardChannelCommands {
         if (existingRecord) {
             await this.replyStatus(command, existingRecord.getDataValue('triggerPrefix'), existingRecord.getDataValue('commandPrefix'), existingRecord.getDataValue('host'), existingRecord.getDataValue('port'), existingRecord.getDataValue('password'));
         } else {
-            await command.reply({ content: `Channel \`\`${command.channelId}\`\` not watched.`, flags: 'Ephemeral' });
+            await command.reply({
+                embeds: [{
+                    color: FAILED_COLOR,
+                    title: `Current channel is not being watched.`
+                }],
+                flags: 'Ephemeral'
+            });
         }
     }
 
     @Slash({ name: 'edit', description: 'Edit rcon forward parameter' })
     async edit(
-            command: CommandInteraction): Promise<void> {
+        command: CommandInteraction): Promise<void> {
         const existingRecord = await RconForwardChannel.findOne({
             where: {
                 channelId: command.channelId,
@@ -250,7 +277,13 @@ export class RconForwardChannelCommands {
 
             command.showModal(modal);
         } else {
-            await command.reply({ content: `Channel \`\`${command.channelId}\`\` not watched.`, flags: 'Ephemeral' });
+            await command.reply({
+                embeds: [{
+                    color: FAILED_COLOR,
+                    title: `Current channel is not being watched.`
+                }],
+                flags: 'Ephemeral'
+            });
         }
     }
 }
