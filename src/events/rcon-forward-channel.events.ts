@@ -1,7 +1,7 @@
 import type { ArgsOf, Client } from 'discordx';
 import { Discord, On } from 'discordx';
 import { RconForwardChannel } from '../models/rcon-forward-channel.model.js';
-import { Message } from 'discord.js';
+import { Message, TextChannel } from 'discord.js';
 import { FAILED_COLOR, SUCCEEDED_COLOR } from '../utils/constant.js';
 // @ts-ignore
 import Rcon from 'rcon';
@@ -24,12 +24,14 @@ const send = (message: Message, host: string, port: number, password: string, co
             }
             connectionMap[connectionName].queuedCommands = [];
         }).on('response', (str: string) => {
-            connectionMap[connectionName].channel.send({
-                embeds: [{
-                    color: SUCCEEDED_COLOR,
-                    title: str
-                }]
-            });
+            connectionMap[connectionName].channels.foreach((channel: TextChannel) => {
+                channel.send({
+                    embeds: [{
+                        color: SUCCEEDED_COLOR,
+                        title: str
+                    }]
+                });
+            })
         }).on('error', (err: Error) => {
             connectionMap[connectionName].channel.send({
                 embeds: [{
@@ -42,6 +44,14 @@ const send = (message: Message, host: string, port: number, password: string, co
         });
 
         connectionMap[connectionName].conn.connect();
+    }
+
+    if (!connectionMap[connectionName].channels?.find((x: TextChannel) => x.id === message.channel.id)) {
+        if (!connectionMap[connectionName].channels) {
+            connectionMap[connectionName].channels = [message.channel]
+        } else {
+            connectionMap[connectionName].channels.push(message.channel)
+        }
     }
 
     if (connectionMap[connectionName].authenticated) {
