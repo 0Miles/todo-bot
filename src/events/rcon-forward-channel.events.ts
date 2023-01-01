@@ -24,14 +24,14 @@ const send = (message: Message, host: string, port: number, password: string, co
             }
             connectionMap[connectionName].queuedCommands = [];
         }).on('response', (str: string) => {
-            connectionMap[connectionName].channels.foreach((channel: TextChannel) => {
+            for(const channel of connectionMap[connectionName]?.channels ?? []) {
                 channel.send({
                     embeds: [{
                         color: SUCCEEDED_COLOR,
                         title: str
                     }]
                 });
-            })
+            }
         }).on('error', (err: Error) => {
             connectionMap[connectionName].channel.send({
                 embeds: [{
