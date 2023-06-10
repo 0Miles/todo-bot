@@ -62,7 +62,7 @@ const send = (message: Message, host: string, port: number, password: string, co
 }
 
 @Discord()
-export class TodoChannelEvents {
+export class RconForwardChannelEvents {
     @On()
     async messageCreate([message]: ArgsOf<'messageCreate'>, client: Client): Promise<void> {
         try {
