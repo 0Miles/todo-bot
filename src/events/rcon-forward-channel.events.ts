@@ -28,7 +28,7 @@ const send = (message: Message, host: string, port: number, password: string, co
                 channel.send({
                     embeds: [{
                         color: SUCCEEDED_COLOR,
-                        title: str
+                        title: !str || (typeof str !== 'string') ? 'Sent successful' : str
                     }]
                 });
             }
