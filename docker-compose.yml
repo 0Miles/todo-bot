@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  bot:
+    build: .
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - BOT_TOKEN=${BOT_TOKEN:?Discord Token is required}
+    volumes:
+      - todo-bot-data:/usr/src/app/data
+
+volumes:
+  todo-bot-data:
