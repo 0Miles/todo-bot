@@ -1,72 +1,63 @@
 import type { ArgsOf, Client } from 'discordx';
 import { Discord, On } from 'discordx';
 import { RconForwardChannel } from '../models/rcon-forward-channel.model.js';
-import { Message, TextChannel } from 'discord.js';
-import { FAILED_COLOR, SUCCEEDED_COLOR } from '../utils/constant.js';
-// @ts-ignore
-import Rcon from 'rcon';
+import { FAILED_COLOR } from '../utils/constant.js';
+import { RconQueueService } from '../services/rcon-queue.service.js';
+import { RconConnectionService } from '../services/rcon-connection.service.js';
 
-const connectionMap: any = {};
-
-const send = (message: Message, host: string, port: number, password: string, content: string) => {
-    const connectionName = `${host}:${port}`;
-    if (!connectionMap[connectionName]) {
-        connectionMap[connectionName] = {
-            conn: new Rcon(host, port, password),
-            channel: message.channel,
-            authenticated: false,
-            queuedCommands: []
-        };
-        connectionMap[connectionName].conn.on('auth', () => {
-            connectionMap[connectionName].authenticated = true;
-            for (const command of connectionMap[connectionName].queuedCommands) {
-                connectionMap[connectionName].conn.send(command);
-            }
-            connectionMap[connectionName].queuedCommands = [];
-        }).on('response', (str: string) => {
-            for(const channel of connectionMap[connectionName]?.channels ?? []) {
-                channel.send({
-                    embeds: [{
-                        color: SUCCEEDED_COLOR,
-                        title: !str || (typeof str !== 'string') ? 'Sent successful' : str
-                    }]
-                });
-            }
-        }).on('error', (err: Error) => {
-            connectionMap[connectionName].channel.send({
-                embeds: [{
-                    color: FAILED_COLOR,
-                    title: err.message
-                }]
-            });
-        }).on('end', () => {
-            delete connectionMap[connectionName];
-        });
-
-        connectionMap[connectionName].conn.connect();
-    }
-
-    if (!connectionMap[connectionName].channels?.find((x: TextChannel) => x.id === message.channel.id)) {
-        if (!connectionMap[connectionName].channels) {
-            connectionMap[connectionName].channels = [message.channel]
-        } else {
-            connectionMap[connectionName].channels.push(message.channel)
-        }
-    }
-
-    if (connectionMap[connectionName].authenticated) {
-        connectionMap[connectionName].conn.send(content);
-    } else {
-        connectionMap[connectionName].queuedCommands.push(content);
-    }
-}
+const CLEANUP_INTERVAL = 5 * 60 * 1000; // 5 minutes
 
 @Discord()
 export class RconForwardChannelEvents {
+    private cleanupInterval: NodeJS.Timeout | null = null;
+
+    constructor() {
+        this.startCleanupInterval();
+        this.setupProcessHandlers();
+    }
+
+    private setupProcessHandlers() {
+        process.on('SIGINT', () => this.cleanup());
+        process.on('SIGTERM', () => this.cleanup());
+    }
+
+    private startCleanupInterval() {
+        if (this.cleanupInterval) {
+            clearInterval(this.cleanupInterval);
+        }
+
+        this.cleanupInterval = setInterval(async () => {
+            const now = new Date();
+            const connections = RconConnectionService.getAllConnections();
+            
+            // 清理過期的連接
+            for (const [connectionName, connection] of Object.entries(connections)) {
+                if (now.getTime() - connection.lastUsed.getTime() > RconConnectionService.connectionTimeout) {
+                    console.log(`Cleaning up inactive connection: ${connectionName}`);
+                    await RconConnectionService.cleanupConnection(connectionName);
+                }
+            }
+        }, CLEANUP_INTERVAL);
+    }
+
+    private async cleanup() {
+        if (this.cleanupInterval) {
+            clearInterval(this.cleanupInterval);
+            this.cleanupInterval = null;
+        }
+
+        const connections = RconConnectionService.getAllConnections();
+        for (const [connectionName, connection] of Object.entries(connections)) {
+            await RconConnectionService.cleanupConnection(connectionName);
+        }
+    }
+
     @On()
     async messageCreate([message]: ArgsOf<'messageCreate'>, client: Client): Promise<void> {
         try {
-            const existingRecord = await await RconForwardChannel.findOne({
+            if (message.author.bot) return;
+
+            const existingRecord = await RconForwardChannel.findOne({
                 where: {
                     channelId: message.channelId,
                     guildId: message.guildId
@@ -78,11 +69,26 @@ export class RconForwardChannelEvents {
                 const commandPrefix: string = existingRecord.getDataValue('commandPrefix');
                 if (message.content.startsWith(triggerPrefix)) {
                     const command = commandPrefix + message.content.substring(triggerPrefix.length);
-                    send(message, existingRecord.getDataValue('host'), existingRecord.getDataValue('port'), existingRecord.getDataValue('password'), command);
+                    await RconQueueService.send(
+                        message, 
+                        existingRecord.getDataValue('host'), 
+                        existingRecord.getDataValue('port'), 
+                        existingRecord.getDataValue('password'), 
+                        command
+                    );
                 }
             }
-        } catch (ex) {
-            console.error(ex);
+        } catch (error) {
+            console.error('Message handling error:', error);
+            if (message.channel.isTextBased()) {
+                await message.channel.send({
+                    embeds: [{
+                        color: FAILED_COLOR,
+                        title: 'Error',
+                        description: '處理指令時發生錯誤。'
+                    }]
+                }).catch(console.error);
+            }
         }
     }
 }
