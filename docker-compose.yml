@@ -9,7 +9,7 @@ services:
       - NODE_ENV=${NODE_ENV:-production}
       - BOT_TOKEN=${BOT_TOKEN:?Discord Token is required}
     volumes:
-      - todo-bot-data:/usr/src/app/data
+      - karyl-chan-data:/usr/src/app/data
 
 volumes:
-  todo-bot-data:
+  karyl-chan-data:
