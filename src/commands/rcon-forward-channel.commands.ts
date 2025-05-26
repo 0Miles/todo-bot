@@ -62,6 +62,7 @@ export class RconForwardChannelCommands {
                         .setStyle(TextInputStyle.Short)
                         .setValue('/')
                         .setMaxLength(10)
+                        .setRequired(false)
                 )
             );
 
@@ -270,6 +271,7 @@ export class RconForwardChannelCommands {
                         .setStyle(TextInputStyle.Short)
                         .setValue(existingRecord.getDataValue('commandPrefix'))
                         .setMaxLength(10)
+                        .setRequired(false)
                 )
             );
 
