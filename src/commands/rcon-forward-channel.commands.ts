@@ -61,7 +61,6 @@ export class RconForwardChannelCommands {
                         .setLabel('Command prefix')
                         .setStyle(TextInputStyle.Short)
                         .setValue('/')
-                        .setMinLength(1)
                         .setMaxLength(10)
                 )
             );
@@ -92,7 +91,7 @@ export class RconForwardChannelCommands {
                     guildId: interaction.guildId
                 }
             });
-            
+
             if (!existingRecord) {
                 await RconForwardChannel.create({
                     channelId: interaction.channelId,
@@ -270,7 +269,6 @@ export class RconForwardChannelCommands {
                         .setLabel('Command prefix')
                         .setStyle(TextInputStyle.Short)
                         .setValue(existingRecord.getDataValue('commandPrefix'))
-                        .setMinLength(1)
                         .setMaxLength(10)
                 )
             );
