@@ -1,6 +1,6 @@
 import { TextChannel } from 'discord.js';
 import Rcon from 'rcon';
-import { FAILED_COLOR } from '../utils/constant.js';
+import { DEFAULT_COLOR, FAILED_COLOR, SUCCEEDED_COLOR } from '../utils/constant.js';
 
 interface RconConnection {
     conn: Rcon;
@@ -163,7 +163,7 @@ export class RconConnectionService {
                 for(const channel of connection.channels) {
                     channel.send({
                         embeds: [{
-                            color: FAILED_COLOR,
+                            color: SUCCEEDED_COLOR,
                             title: !str || (typeof str !== 'string') ? 'Sent successful' : str
                         }]
                     }).catch(error => {
@@ -200,7 +200,7 @@ export class RconConnectionService {
                 try {
                     await channel.send({
                         embeds: [{
-                            color: FAILED_COLOR,
+                            color: DEFAULT_COLOR,
                             title: 'Connection Closed',
                             description: `與 ${connection.host}:${connection.port} 的連接已關閉。未發送的指令將被清除。`
                         }]
@@ -246,7 +246,7 @@ export class RconConnectionService {
                 try {
                     await channel.send({
                         embeds: [{
-                            color: FAILED_COLOR,
+                            color: DEFAULT_COLOR,
                             title: 'Connection Lost',
                             description: `正在嘗試重新連接 (${connection.reconnectAttempts}/${MAX_RETRY_ATTEMPTS})...`
                         }]
